@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Engage with Me</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: left;
+        padding: 50px;
+      }
+
+      #unlockedImage {
+        display: none;
+      }
+      #measured {
+        display: none;
+      }
+      #imageButton {
+        width: 30vw;
+        height: 30%;
+        cursor: pointer;
+      }
+      #laced {
+        font-family: Arial, sans-serif;
+        font-size: 50px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Engage With Me: A Selfie as an Experience</h1>
+    <h2>Complete the tasks to engage with my selfie.</h2>
+    <button id="startButton" onclick="startButton()">Deep breath...</button>
+
+    <div id="step1" style="display: none">
+      <p>Sit in silence for 30 seconds...</p>
+      <button id="measure" onclick="step1()">
+        I feel like it's been 30 seconds
+      </button>
+      <p id="measured"></p>
+    </div>
+
+    <div id="step2" style="display: none">
+      <!-- google mediapipe -->
+      <p>
+        Make a disgusted face. Yes I can see you. You are disgusted by this
+        engagement aren't you? You are disgusted by surveillance...
+      </p>
+    </div>
+
+    <div id="step3" style="display: none">
+      <!-- okay just have like a recording thingy microphone button, immediately move to next step once released -->
+      <p>Whisper a small secret to me. I won't keep it (that's true)</p>
+    </div>
+
+    <div id="step4" style="display: none">
+      <div id="pre4" style="display: block">
+        <p>eat this:</p>
+        <img
+          id="imageButton"
+          src="cake.png"
+          alt="Image Button"
+          onclick="step4()"
+        />
+      </div>
+      <div id="post4" style="display: none">
+        <p id="woreOff" style="display: none">it wore off. you're fine now. did you like the cake?</p>
+        <p id="laced">IT WAS LACED!!!</p>
+      </div>
+    </div>
+
+    <div id="step6" style="display: none">
+      <!-- text box submission, must match "i love you"-->
+      <p>tell me that you love me</p>
+    </div>
+
+    <div id="step7" style="display: none">
+      <!-- randomize 5 affirmations that are silly, when clicked one downloads to the page-->
+      <p>take a random affirmation</p>
+    </div>
+
+    <div id="unlockedImage">
+      <img src="selfie.jpeg" alt="Unlocked Image" />
+    </div>
+
+    <script>
+      var clickCount = 0;
+      var seconds = 0;
+
+      function startButton() {
+        var button = document.getElementById("startButton");
+        clickCount++;
+        if (clickCount === 1) {
+          document.getElementById("startButton").innerText = "Let's begin";
+        } else if (clickCount === 2) {
+          document.getElementById("startButton").style.display = "none";
+          document.getElementById("step4").style.display = "block";
+          timerInterval = setInterval(function () {
+            seconds++;
+          }, 1000);
+        }
+      }
+
+      function step1() {
+        if (seconds < 1) {
+          document.body.style.backgroundColor = "red";
+          setTimeout(function () {
+            document.body.style.backgroundColor = "white";
+          }, 150);
+        }
+        if (seconds > 1) {
+          document.getElementById("measured").innerText =
+            "It has actually been " + seconds + " seconds";
+          document.getElementById("measured").style.display = "block";
+
+          setTimeout(function () {
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+          }, 2500);
+        }
+      }
+
+      function step4() {
+        document.getElementById("pre4").style.display = "none";
+        var post4 = document.getElementById("post4");
+        post4.style.display = "block";
+        if ((post4.style.display = "block")) {
+          setTimeout(function () {
+            document.body.style.backgroundImage = "url('giphy.gif')";
+            document.body.style.backgroundColor = "rgba(255,255,255,0.6)";
+            document.body.style.backgroundRepeat = "repeat-y";
+            document.body.style.backgroundSize = "cover";
+            document.querySelector("h1").style.display = "none";
+            document.querySelector("h2").style.display = "none";
+          }, 150);
+
+          setTimeout(function () {
+            document.body.style.backgroundImage = "none";
+            document.querySelector("h1").style.display = "block";
+            document.querySelector("h2").style.display = "block";
+            document.getElementById("woreOff").style.display = "block";
+          }, 3000);
+        }
+      }
+    </script>
+  </body>
+</html>
