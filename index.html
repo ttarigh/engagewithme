@@ -43,17 +43,32 @@
     </div>
 
     <div id="step2" style="display: none">
-      <!-- google mediapipe -->
       <p>
-        Make a disgusted face. Yes I can see you. You are disgusted by this
-        engagement aren't you? You are disgusted by surveillance...
+        Make an angry face. Yes I can see you. You are angry by this engagement
+        aren't you? You are angry bc of my surveillance...
       </p>
+      <div id="currentEmotionMessage">
+        Your current emotion is: <span id="currentEmotion"></span>
+      </div>
+      <video id="video" width="600" height="450" autoplay></video>
+      <script defer src="face-api.min.js"></script>
     </div>
 
     <div id="step3" style="display: none">
-      <!-- Have a recording microphone button that stores the user's recording as a variable named "secret"-->
       <p>Whisper a small secret to me. I won't keep it (that's true)</p>
-      <button id="recordSecret" onclick="startRecording()">Start Recording</button>
+      <button id="recordSecret" onclick="startRecording()">
+        Start Recording
+      </button>
+      <button
+        id="stopRecording"
+        style="display: none"
+        onclick="stopRecording()"
+      >
+        Stop Recording
+      </button>
+      <button id="submitSecret" style="display: none" onclick="submitSecret()">
+        Submit
+      </button>
     </div>
 
     <div id="step4" style="display: none">
@@ -61,7 +76,7 @@
         <p>eat this:</p>
         <img
           id="imageButton"
-          src="cake.png"
+          src="cake1.png"
           alt="Image Button"
           onclick="step4()"
         />
@@ -82,19 +97,29 @@
       <p>tell me that you love me</p>
       <input type="text" id="loveInput" />
       <button onclick="checkLove()">Check</button>
-      <p id="negativeLove" style="display: none">EWWWWW omg...jk I already knew that baby!</p>
+      <p id="negativeLove" style="display: none">
+        EWWWWW omg...jk I already knew that baby!
+      </p>
       <p id="positiveLove" style="display: none">
         try again idiot. tell me that you love me!!
       </p>
     </div>
 
     <div id="step6" style="display: none">
-      <!-- array of 5 pictures that are silly, when clicked one downloads to the page-->
-      <button  onclick="downloadAffirmation()" >take a random affirmation</button>
+      <button id="affirmationButton" onclick="downloadAffirmation()">
+        take a random affirmation
+      </button>
+      <button
+        id="internalizedButton"
+        style="display: none"
+        onclick="lastStep()"
+      >
+        I have internalized the good words.
+      </button>
     </div>
 
     <div id="unlockedImage">
-      <img src="selfie.jpeg" alt="Unlocked Image" />
+      <img style="width: 40%" src="selfie.png" alt="Unlocked Image" />
     </div>
 
     <script>
@@ -129,7 +154,8 @@
 
           setTimeout(function () {
             document.getElementById("step1").style.display = "none";
-            document.getElementById("step4").style.display = "block";
+            document.getElementById("step2").style.display = "block";
+            startVideoAndDetection();
           }, 2500);
         }
       }
@@ -148,13 +174,18 @@
             document.querySelector("h2").style.display = "none";
           }, 150);
 
+          let audioElement = new Audio("trippy.mp3");
+          audioElement.currentTime = 22;
+          audioElement.play();
+          setTimeout(() => audioElement.pause(), 5000);
+
           setTimeout(function () {
             document.body.style.backgroundImage = "none";
             document.querySelector("h1").style.display = "block";
             document.querySelector("h2").style.display = "block";
             document.getElementById("woreOff").style.display = "block";
             document.getElementById("nextStep5").style.display = "block";
-          }, 3000);
+          }, 5000);
         }
       }
       function takeMeToStep5() {
@@ -185,25 +216,175 @@
       }
 
       const affirmationImages = [
-            'aff1.png',
-            'aff2.png',
-            'aff3.png',
-            'aff4.png',
-            'aff5.png'
-        ];
+        "aff1.png",
+        "aff2.png",
+        "aff3.png",
+        "aff4.png",
+        "aff5.png",
+      ];
 
-        function downloadAffirmation() {
-            const randomIndex = Math.floor(Math.random() * affirmationImages.length);
-            const downloadLink = document.createElement('a');
-            downloadLink.href = affirmationImages[randomIndex];
-            downloadLink.download = 'affirmation.jpg';
-            downloadLink.click();
-            document.getElementById("step6").style.display = "none";
-            document.querySelector("h1").innerText = "You unlocked my selfie!";
-            document.querySelector("h2").style.display = "none";
-            document.getElementById("unlockedImage").style.display = "block";
+      function downloadAffirmation() {
+        const randomIndex = Math.floor(
+          Math.random() * affirmationImages.length
+        );
+        const downloadLink = document.createElement("a");
+        downloadLink.href = affirmationImages[randomIndex];
+        downloadLink.download = "affirmation.jpg";
+        downloadLink.click();
+        document.getElementById("affirmationButton").style.display = "none";
+        document.getElementById("internalizedButton").style.display = "block";
+      }
+      function lastStep() {
+        document.getElementById("step6").style.display = "none";
+        document.querySelector("h1").innerText = "You unlocked my selfie!";
+        document.querySelector("h2").style.display = "none";
+        document.getElementById("unlockedImage").style.display = "block";
+      }
 
+      let mediaRecorder;
+      let chunks = [];
+
+      function startRecording() {
+        navigator.mediaDevices
+          .getUserMedia({ audio: true })
+          .then(function (stream) {
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = function (e) {
+              if (e.data.size > 0) {
+                chunks.push(e.data);
+              }
+            };
+
+            mediaRecorder.onstop = function () {
+              let blob = new Blob(chunks, { type: "audio/wav" });
+              let url = URL.createObjectURL(blob);
+              // Assign the recording to a variable named "secret"
+              window.secret = url;
+
+              // Display additional buttons after recording is stopped
+              document.getElementById("stopRecording").style.display = "none";
+              document.getElementById("submitSecret").style.display =
+                "inline-block";
+            };
+
+            mediaRecorder.start();
+
+            // Display stop recording button
+            document.getElementById("recordSecret").style.display = "none";
+            document.getElementById("stopRecording").style.display =
+              "inline-block";
+          })
+          .catch(function (err) {
+            console.log("Error: " + err);
+          });
+      }
+
+      function stopRecording() {
+        mediaRecorder.stop();
+      }
+
+      function submitSecret() {
+        let audioElement = new Audio(window.secret);
+        audioElement.play();
+        audioElement.addEventListener("ended", function () {
+          document.getElementById("step3").style.display = "none";
+          document.getElementById("step4").style.display = "block";
+        });
+      }
+
+      let isVideoStarted = false;
+
+      function startVideoAndDetection() {
+        if (!isVideoStarted) {
+          const video = document.getElementById("video");
+
+          navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then((stream) => {
+              video.srcObject = stream;
+              video.play();
+
+              // Wait for the stream to be ready before starting face detection
+              video.addEventListener("loadeddata", () =>
+                startFaceDetection(video)
+              );
+            })
+            .catch((error) => {
+              console.error("Error accessing the camera:", error);
+            });
+
+          isVideoStarted = true;
         }
+      }
+
+      function stopVideoStream() {
+        const video = document.getElementById("video");
+
+        // Stop the video stream and tracks
+        const tracks = video.srcObject.getTracks();
+        tracks.forEach((track) => track.stop());
+
+        // Clear the video source to stop displaying
+        video.srcObject = null;
+      }
+
+      async function startFaceDetection() {
+        const video = document.getElementById("video");
+        const canvas = faceapi.createCanvasFromMedia(video);
+        document.body.append(canvas);
+        const displaySize = { width: video.width, height: video.height };
+        faceapi.matchDimensions(canvas, displaySize);
+
+        // Load TinyFaceDetector and FaceLandmark68Net models before face detection
+        await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+        await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+        await faceapi.nets.faceExpressionNet.loadFromUri("/models");
+
+        setInterval(async () => {
+          const detections = await faceapi
+            .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceExpressions();
+          const resizedDetections = faceapi.resizeResults(
+            detections,
+            displaySize
+          );
+          canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+
+          const firstDetection = detections[0];
+
+          if (firstDetection && firstDetection.expressions) {
+            let happyDetected = false;
+
+            for (const emotion in firstDetection.expressions) {
+              const emotionValue = firstDetection.expressions[emotion];
+
+              // Check if the value is between 0.8 and 1
+              if (emotionValue > 0.8 && emotionValue < 1) {
+                // Print the emotion name
+                document.getElementById("currentEmotion").innerText = emotion;
+              }
+              // Check if the value is between 0.8 and 1 for happiness
+              if (
+                emotion === "angry" &&
+                emotionValue > 0.8 &&
+                emotionValue < 1
+              ) {
+                happyDetected = true;
+                document.body.style.backgroundColor = "chartreuse";
+                setTimeout(function () {
+                  document.getElementById("step2").style.display = "none";
+                  document.getElementById("step3").style.display = "block";
+                  document.body.style.backgroundColor = "white";
+                  stopVideoStream();
+                }, 1000);
+                break;
+              }
+            }
+          }
+        }, 100);
+      }
     </script>
   </body>
 </html>
