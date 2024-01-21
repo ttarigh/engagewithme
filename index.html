@@ -51,8 +51,9 @@
     </div>
 
     <div id="step3" style="display: none">
-      <!-- okay just have like a recording thingy microphone button, immediately move to next step once released -->
+      <!-- Have a recording microphone button that stores the user's recording as a variable named "secret"-->
       <p>Whisper a small secret to me. I won't keep it (that's true)</p>
+      <button id="recordSecret" onclick="startRecording()">Start Recording</button>
     </div>
 
     <div id="step4" style="display: none">
@@ -66,19 +67,30 @@
         />
       </div>
       <div id="post4" style="display: none">
-        <p id="woreOff" style="display: none">it wore off. you're fine now. did you like the cake?</p>
+        <p id="woreOff" style="display: none">
+          it wore off. you're fine now. did you like the cake?
+        </p>
+        <button id="nextStep5" style="display: none" onclick="takeMeToStep5()">
+          Yes I loved it.
+        </button>
         <p id="laced">IT WAS LACED!!!</p>
       </div>
     </div>
 
-    <div id="step6" style="display: none">
+    <div id="step5" style="display: none">
       <!-- text box submission, must match "i love you"-->
       <p>tell me that you love me</p>
+      <input type="text" id="loveInput" />
+      <button onclick="checkLove()">Check</button>
+      <p id="negativeLove" style="display: none">EWWWWW omg...jk I already knew that baby!</p>
+      <p id="positiveLove" style="display: none">
+        try again idiot. tell me that you love me!!
+      </p>
     </div>
 
-    <div id="step7" style="display: none">
-      <!-- randomize 5 affirmations that are silly, when clicked one downloads to the page-->
-      <p>take a random affirmation</p>
+    <div id="step6" style="display: none">
+      <!-- array of 5 pictures that are silly, when clicked one downloads to the page-->
+      <button  onclick="downloadAffirmation()" >take a random affirmation</button>
     </div>
 
     <div id="unlockedImage">
@@ -96,7 +108,7 @@
           document.getElementById("startButton").innerText = "Let's begin";
         } else if (clickCount === 2) {
           document.getElementById("startButton").style.display = "none";
-          document.getElementById("step4").style.display = "block";
+          document.getElementById("step1").style.display = "block";
           timerInterval = setInterval(function () {
             seconds++;
           }, 1000);
@@ -104,20 +116,20 @@
       }
 
       function step1() {
-        if (seconds < 1) {
+        if (seconds < 30) {
           document.body.style.backgroundColor = "red";
           setTimeout(function () {
             document.body.style.backgroundColor = "white";
           }, 150);
         }
-        if (seconds > 1) {
+        if (seconds > 30) {
           document.getElementById("measured").innerText =
             "It has actually been " + seconds + " seconds";
           document.getElementById("measured").style.display = "block";
 
           setTimeout(function () {
             document.getElementById("step1").style.display = "none";
-            document.getElementById("step2").style.display = "block";
+            document.getElementById("step4").style.display = "block";
           }, 2500);
         }
       }
@@ -141,9 +153,55 @@
             document.querySelector("h1").style.display = "block";
             document.querySelector("h2").style.display = "block";
             document.getElementById("woreOff").style.display = "block";
+            document.getElementById("nextStep5").style.display = "block";
           }, 3000);
         }
       }
+      function takeMeToStep5() {
+        document.getElementById("step4").style.display = "none";
+        document.getElementById("step5").style.display = "block";
+      }
+      function checkLove() {
+        var userInput = document
+          .getElementById("loveInput")
+          .value.toLowerCase();
+        if (userInput === "i love you") {
+          document.getElementById("positiveLove").style.display = "none";
+          document.getElementById("negativeLove").style.display = "block";
+
+          setTimeout(function () {
+            document.getElementById("step5").style.display = "none";
+            document.getElementById("step6").style.display = "block";
+          }, 1000);
+        } else {
+          document.getElementById("positiveLove").style.display = "block";
+          document.getElementById("negativeLove").style.display = "none";
+
+          document.body.style.backgroundColor = "red";
+          setTimeout(function () {
+            document.body.style.backgroundColor = "white";
+          }, 150);
+        }
+      }
+
+      const affirmationImages = [
+            'selfie.jpeg',
+            'cake.png',
+            'giphy.gif'
+        ];
+
+        function downloadAffirmation() {
+            const randomIndex = Math.floor(Math.random() * affirmationImages.length);
+            const downloadLink = document.createElement('a');
+            downloadLink.href = affirmationImages[randomIndex];
+            downloadLink.download = 'affirmation.jpg';
+            downloadLink.click();
+            document.getElementById("step6").style.display = "none";
+            document.querySelector("h1").innerText = "You unlocked my selfie!";
+            document.querySelector("h2").style.display = "none";
+            document.getElementById("unlockedImage").style.display = "block";
+
+        }
     </script>
   </body>
 </html>
