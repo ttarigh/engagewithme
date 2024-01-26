@@ -154,8 +154,13 @@
 
           setTimeout(function () {
             document.getElementById("step1").style.display = "none";
-            document.getElementById("step2").style.display = "block";
-            startVideoAndDetection();
+            if (isMobileDevice()) {
+              document.getElementById("step3").style.display = "block";
+            } else {
+              //go to step 2 only if we aren't on mobile 
+              document.getElementById("step2").style.display = "block";
+              startVideoAndDetection();
+            }
           }, 2500);
         }
       }
