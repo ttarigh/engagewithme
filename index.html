@@ -157,7 +157,7 @@
             if (isMobileDevice()) {
               document.getElementById("step3").style.display = "block";
             } else {
-              //go to step 2 only if we aren't on mobile 
+              //go to step 2 only if we aren't on mobile
               document.getElementById("step2").style.display = "block";
               startVideoAndDetection();
             }
@@ -332,6 +332,13 @@
 
         // Clear the video source to stop displaying
         video.srcObject = null;
+      }
+
+      function isMobileDevice() {
+        return (
+          typeof window.orientation !== "undefined" ||
+          navigator.userAgent.indexOf("IEMobile") !== -1
+        );
       }
 
       async function startFaceDetection() {
